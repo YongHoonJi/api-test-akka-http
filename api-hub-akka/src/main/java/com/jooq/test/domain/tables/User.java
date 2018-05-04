@@ -9,7 +9,6 @@ import com.jooq.test.domain.Keys;
 import com.jooq.test.domain.TestTemp;
 import com.jooq.test.domain.tables.records.UserRecord;
 
-import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
 
@@ -40,7 +39,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class User extends TableImpl<UserRecord> {
 
-    private static final long serialVersionUID = 2049533798;
+    private static final long serialVersionUID = 1696419101;
 
     /**
      * The reference instance of <code>test_temp.user</code>
@@ -66,44 +65,9 @@ public class User extends TableImpl<UserRecord> {
     public final TableField<UserRecord, String> ACCOUNT = createField("account", org.jooq.impl.SQLDataType.VARCHAR(100).nullable(false), this, "계정");
 
     /**
-     * The column <code>test_temp.user.active_yn</code>. 사용여부
-     */
-    public final TableField<UserRecord, String> ACTIVE_YN = createField("active_yn", org.jooq.impl.SQLDataType.CHAR(1).nullable(false).defaultValue(org.jooq.impl.DSL.inline("Y", org.jooq.impl.SQLDataType.CHAR)), this, "사용여부");
-
-    /**
-     * The column <code>test_temp.user.create_dttm</code>. 생성일시
-     */
-    public final TableField<UserRecord, Timestamp> CREATE_DTTM = createField("create_dttm", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false).defaultValue(org.jooq.impl.DSL.field("CURRENT_TIMESTAMP", org.jooq.impl.SQLDataType.TIMESTAMP)), this, "생성일시");
-
-    /**
-     * The column <code>test_temp.user.dept</code>. 부서
-     */
-    public final TableField<UserRecord, String> DEPT = createField("dept", org.jooq.impl.SQLDataType.CHAR(3).nullable(false), this, "부서");
-
-    /**
-     * The column <code>test_temp.user.email</code>. 이메일
-     */
-    public final TableField<UserRecord, String> EMAIL = createField("email", org.jooq.impl.SQLDataType.VARCHAR(100).nullable(false), this, "이메일");
-
-    /**
      * The column <code>test_temp.user.name</code>. 이름
      */
     public final TableField<UserRecord, String> NAME = createField("name", org.jooq.impl.SQLDataType.VARCHAR(50).nullable(false), this, "이름");
-
-    /**
-     * The column <code>test_temp.user.password</code>. 패스워드
-     */
-    public final TableField<UserRecord, String> PASSWORD = createField("password", org.jooq.impl.SQLDataType.VARCHAR(12).nullable(false), this, "패스워드");
-
-    /**
-     * The column <code>test_temp.user.role</code>. 권한
-     */
-    public final TableField<UserRecord, String> ROLE = createField("role", org.jooq.impl.SQLDataType.CHAR(3).nullable(false), this, "권한");
-
-    /**
-     * The column <code>test_temp.user.update_dttm</code>. 수정일시
-     */
-    public final TableField<UserRecord, Timestamp> UPDATE_DTTM = createField("update_dttm", org.jooq.impl.SQLDataType.TIMESTAMP, this, "수정일시");
 
     /**
      * Create a <code>test_temp.user</code> table reference
@@ -147,7 +111,7 @@ public class User extends TableImpl<UserRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.USER_PRIMARY, Indexes.USER_UK_DNQ7R8JCMLFT7L8L4J79L1H74, Indexes.USER_UK_OB8KQYQQGMEFL0ACO34AKDTPE);
+        return Arrays.<Index>asList(Indexes.USER_PRIMARY, Indexes.USER_UK_DNQ7R8JCMLFT7L8L4J79L1H74);
     }
 
     /**
@@ -171,7 +135,7 @@ public class User extends TableImpl<UserRecord> {
      */
     @Override
     public List<UniqueKey<UserRecord>> getKeys() {
-        return Arrays.<UniqueKey<UserRecord>>asList(Keys.KEY_USER_PRIMARY, Keys.KEY_USER_UK_DNQ7R8JCMLFT7L8L4J79L1H74, Keys.KEY_USER_UK_OB8KQYQQGMEFL0ACO34AKDTPE);
+        return Arrays.<UniqueKey<UserRecord>>asList(Keys.KEY_USER_PRIMARY, Keys.KEY_USER_UK_DNQ7R8JCMLFT7L8L4J79L1H74);
     }
 
     /**

@@ -44,7 +44,6 @@ public class Keys {
     public static final UniqueKey<AlpakkaSlickJavadslTestUsersRecord> KEY_ALPAKKA_SLICK_JAVADSL_TEST_USERS_PRIMARY = UniqueKeys0.KEY_ALPAKKA_SLICK_JAVADSL_TEST_USERS_PRIMARY;
     public static final UniqueKey<UserRecord> KEY_USER_PRIMARY = UniqueKeys0.KEY_USER_PRIMARY;
     public static final UniqueKey<UserRecord> KEY_USER_UK_DNQ7R8JCMLFT7L8L4J79L1H74 = UniqueKeys0.KEY_USER_UK_DNQ7R8JCMLFT7L8L4J79L1H74;
-    public static final UniqueKey<UserRecord> KEY_USER_UK_OB8KQYQQGMEFL0ACO34AKDTPE = UniqueKeys0.KEY_USER_UK_OB8KQYQQGMEFL0ACO34AKDTPE;
 
     // -------------------------------------------------------------------------
     // FOREIGN KEY definitions
@@ -64,6 +63,5 @@ public class Keys {
         public static final UniqueKey<AlpakkaSlickJavadslTestUsersRecord> KEY_ALPAKKA_SLICK_JAVADSL_TEST_USERS_PRIMARY = Internal.createUniqueKey(AlpakkaSlickJavadslTestUsers.ALPAKKA_SLICK_JAVADSL_TEST_USERS, "KEY_alpakka_slick_javadsl_test_users_PRIMARY", AlpakkaSlickJavadslTestUsers.ALPAKKA_SLICK_JAVADSL_TEST_USERS.ID);
         public static final UniqueKey<UserRecord> KEY_USER_PRIMARY = Internal.createUniqueKey(User.USER, "KEY_user_PRIMARY", User.USER.USER_ID);
         public static final UniqueKey<UserRecord> KEY_USER_UK_DNQ7R8JCMLFT7L8L4J79L1H74 = Internal.createUniqueKey(User.USER, "KEY_user_UK_dnq7r8jcmlft7l8l4j79l1h74", User.USER.ACCOUNT);
-        public static final UniqueKey<UserRecord> KEY_USER_UK_OB8KQYQQGMEFL0ACO34AKDTPE = Internal.createUniqueKey(User.USER, "KEY_user_UK_ob8kqyqqgmefl0aco34akdtpe", User.USER.EMAIL);
     }
 }

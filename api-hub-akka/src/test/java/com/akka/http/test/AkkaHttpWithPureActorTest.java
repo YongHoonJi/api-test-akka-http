@@ -1,0 +1,138 @@
+package com.akka.http.test;
+
+import static akka.http.javadsl.server.PathMatchers.longSegment;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
+
+import com.actor.repo.RepositorySuperActor;
+import com.actor.repo.msg.RequestMakePoolRepository;
+import com.actor.repo.msg.UserPersistanceCommand;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.jooq.test.domain.tables.records.UserRecord;
+
+import akka.Done;
+import akka.NotUsed;
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
+import akka.actor.Props;
+import akka.http.javadsl.ConnectHttp;
+import akka.http.javadsl.Http;
+import akka.http.javadsl.ServerBinding;
+import akka.http.javadsl.marshallers.jackson.Jackson;
+import akka.http.javadsl.model.HttpRequest;
+import akka.http.javadsl.model.HttpResponse;
+import akka.http.javadsl.model.StatusCodes;
+import akka.http.javadsl.server.AllDirectives;
+import akka.http.javadsl.server.Route;
+import akka.stream.ActorMaterializer;
+import akka.stream.javadsl.Flow;
+
+public class AkkaHttpWithPureActorTest extends AllDirectives {
+
+	public static void main(String[] args) throws Exception {
+		// boot up server using the route as defined below
+		ActorSystem system = ActorSystem.create("routes");
+
+		// make repo-super-actor
+		final ActorRef repoSuperActor = system.actorOf(Props.create(RepositorySuperActor.class), "repo-super-actor");
+		final ActorRef repohubActor = system.actorOf(Props.create(RepositoryHubActor.class), "repo-hub");
+		repoSuperActor.tell(RequestMakePoolRepository.builder().sizeOfPool(3).build(), getSelf());
+		final Http http = Http.get(system);
+		final ActorMaterializer materializer = ActorMaterializer.create(system);
+
+		// In order to access all directives we need an instance where the
+		// routes are define.
+		AkkaHttpWithPureActorTest app = new AkkaHttpWithPureActorTest();
+
+		final Flow<HttpRequest, HttpResponse, NotUsed> routeFlow = app.createRoute().flow(system, materializer);
+		final CompletionStage<ServerBinding> binding = http.bindAndHandle(routeFlow,
+				ConnectHttp.toHost("localhost", 8080), materializer);
+
+		System.out.println("Server online at http://localhost:8080/\nPress RETURN to stop...");
+		System.in.read(); // let it run until user presses return
+
+		binding.thenCompose(ServerBinding::unbind) // trigger unbinding from the  port
+				.thenAccept(unbound -> system.terminate()); // and shutdown when done
+	}
+
+	// (fake) async database query api
+	private CompletionStage<Optional<Item>> fetchItem(long itemId) {
+		return CompletableFuture.completedFuture(Optional.of(new Item("foo", itemId)));
+	}
+
+	// (fake) async database query api
+	private CompletionStage<Done> saveOrder(final Order order) {
+		return CompletableFuture.completedFuture(Done.getInstance());
+	}
+
+	// route 생성
+	private Route createRoute() {
+		return route(
+				get(
+						() -> 
+				pathPrefix("item", () -> path(longSegment(), (Long id) -> {
+					final CompletionStage<Optional<Item>> futureMaybeItem = fetchItem(id);
+					return onSuccess(() -> futureMaybeItem,
+							maybeItem -> maybeItem.map(item -> completeOK(item, Jackson.marshaller())).orElseGet(() -> complete(StatusCodes.NOT_FOUND, "Not Found")));
+							})// end path
+						) // end path Prefix
+				), //end get
+				get(
+						() -> 
+				pathPrefix("find-user", () -> path(longSegment(), (Long id) -> {
+					final CompletionStage<Optional<UserRecord>> futureMaybeItem = findUser();
+					return onSuccess(() -> futureMaybeItem,
+							maybeItem -> maybeItem.map(item -> completeOK(item, Jackson.marshaller())).orElseGet(() -> complete(StatusCodes.NOT_FOUND, "Not Found")));
+							})// end path
+						) // end path Prefix
+				),
+				post(
+						() -> 
+						path("create-order", () -> entity(Jackson.unmarshaller(Order.class), order -> {
+							System.out.println(order.getItems().size());
+							CompletionStage<Done> futureSaved = saveOrder(order);
+							return onSuccess(() -> futureSaved, done -> complete("order created"));
+						} ) // end entity
+								) // end path
+						) // end post 
+				);
+	}
+	
+	private void findUser(ActorRef ref) {
+		ref.tell(new UserPersistanceCommand(), ref.noSender());
+		
+	}
+	
+	
+	private static class Item {
+		final String name;
+		final long id;
+
+		@JsonCreator
+		Item(@JsonProperty("name") String name, @JsonProperty("id") long id) {
+			this.name = name;
+			this.id = id;
+		}
+		public String getName() {
+			return name;
+		}
+		public long getId() {
+			return id;
+		}
+	}
+
+	private static class Order {
+		final List<Item> items;
+		@JsonCreator
+		Order(@JsonProperty("items") List<Item> items) {
+			this.items = items;
+		}
+		public List<Item> getItems() {
+			return items;
+		}
+	}
+}
